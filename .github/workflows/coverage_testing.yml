@@ -6,8 +6,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,10 +16,10 @@ jobs:
       image: node:22
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT }}
-          node-version: 22
+          token: ${{ github.token }}
+          persist-credentials: false
       - run: npm ci
       - run: npm run cover:report
 
@@ -50,11 +49,9 @@ jobs:
       - name: Mark the repository as safe
         run: git config --global --add safe.directory /__w/base64_url/base64_url
 
-      - name: Verify remote URL
+      - name: Configure authenticated push
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/${{ github.repository }}.git
-          echo "Current remote URL:"
-          git remote -v
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
 
       - name: Push changes to main
         run: |
